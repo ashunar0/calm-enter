@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Calm Enter",
+  "version": "1.0.0",
+  "description": "AIチャットで Enter = 改行、Cmd+Enter = 送信に変更する",
+  "permissions": ["storage", "activeTab"],
+  "host_permissions": [
+    "*://claude.ai/*",
+    "*://chatgpt.com/*",
+    "*://gemini.google.com/*",
+    "*://www.perplexity.ai/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://claude.ai/*",
+        "*://chatgpt.com/*",
+        "*://gemini.google.com/*",
+        "*://www.perplexity.ai/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_title": "Calm Enter: ON"
+  },
+  "icons": {
+    "48": "icons/icon-on-48.png",
+    "128": "icons/icon-on-128.png"
+  }
+}
