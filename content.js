@@ -10,40 +10,49 @@ chrome.storage.onChanged.addListener((changes) => {
   }
 });
 
-document.addEventListener(
-  "keydown",
-  (e) => {
-    if (!enabled) return;
+console.log("[Calm Enter] loaded on", location.hostname);
 
-    if (
-      e.key === "Enter" &&
-      !e.metaKey &&
-      !e.ctrlKey &&
-      !e.shiftKey &&
-      !e.isComposing
-    ) {
-      // サイトの送信ハンドラをブロック
+function shouldBlock(e) {
+  return (
+    enabled &&
+    e.key === "Enter" &&
+    !e.metaKey &&
+    !e.ctrlKey &&
+    !e.shiftKey &&
+    !e.isComposing
+  );
+}
+
+// keydown, keypress, keyup すべてを capture phase でブロック
+for (const eventType of ["keydown", "keypress", "keyup"]) {
+  document.addEventListener(
+    eventType,
+    (e) => {
+      if (!shouldBlock(e)) return;
+
+      console.log(`[Calm Enter] blocked ${eventType}`, e.key);
       e.stopPropagation();
+      e.preventDefault();
+      e.stopImmediatePropagation();
 
-      const host = location.hostname;
-      if (host === "claude.ai") {
-        // Claude: preventDefault せず、ブラウザのデフォルト改行挿入に任せる
-      } else if (host === "chatgpt.com") {
-        // ChatGPT: Shift+Enter 再発火で改行
-        e.preventDefault();
-        e.target.dispatchEvent(
-          new KeyboardEvent("keydown", {
-            key: "Enter",
-            code: "Enter",
-            shiftKey: true,
-            bubbles: true,
-            cancelable: true,
-          })
-        );
-      } else {
-        // gemini, perplexity: デフォルト改行挿入に任せる
+      // keydown のときだけ改行を挿入
+      if (eventType === "keydown") {
+        const host = location.hostname;
+        if (host === "chatgpt.com") {
+          e.target.dispatchEvent(
+            new KeyboardEvent("keydown", {
+              key: "Enter",
+              code: "Enter",
+              shiftKey: true,
+              bubbles: true,
+              cancelable: true,
+            })
+          );
+        } else {
+          document.execCommand("insertLineBreak");
+        }
       }
-    }
-  },
-  true // capture phase
-);
+    },
+    true // capture phase
+  );
+}
