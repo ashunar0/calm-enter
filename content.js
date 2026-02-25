@@ -24,7 +24,16 @@ document.addEventListener(
     ) {
       e.preventDefault();
       e.stopPropagation();
-      document.execCommand("insertLineBreak");
+      // Shift+Enter を再発火して改行を挿入（各サイトの既存の改行処理を利用）
+      e.target.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          key: "Enter",
+          code: "Enter",
+          shiftKey: true,
+          bubbles: true,
+          cancelable: true,
+        })
+      );
     }
   },
   true // capture phase
