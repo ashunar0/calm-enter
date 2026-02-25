@@ -50,6 +50,8 @@ for (const eventType of ["keydown", "keypress", "keyup"]) {
           );
         } else if (host === "claude.ai") {
           document.execCommand("insertParagraph");
+        } else if (host === "www.perplexity.ai") {
+          document.execCommand("insertParagraph");
         } else {
           document.execCommand("insertLineBreak");
         }
