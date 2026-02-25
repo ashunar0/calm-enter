@@ -10,8 +10,6 @@ chrome.storage.onChanged.addListener((changes) => {
   }
 });
 
-console.log("[Calm Enter] loaded on", location.hostname);
-
 function shouldBlock(e) {
   return (
     enabled &&
@@ -23,6 +21,30 @@ function shouldBlock(e) {
   );
 }
 
+function dispatchShiftEnter(target) {
+  target.dispatchEvent(
+    new KeyboardEvent("keydown", {
+      key: "Enter",
+      code: "Enter",
+      shiftKey: true,
+      bubbles: true,
+      cancelable: true,
+    })
+  );
+}
+
+function insertNewline(target) {
+  const host = location.hostname;
+  if (host === "chatgpt.com" || host === "www.perplexity.ai") {
+    dispatchShiftEnter(target);
+  } else if (host === "claude.ai") {
+    document.execCommand("insertParagraph");
+  } else {
+    // gemini.google.com 等
+    document.execCommand("insertLineBreak");
+  }
+}
+
 // keydown, keypress, keyup すべてを capture phase でブロック
 for (const eventType of ["keydown", "keypress", "keyup"]) {
   document.addEventListener(
@@ -30,39 +52,12 @@ for (const eventType of ["keydown", "keypress", "keyup"]) {
     (e) => {
       if (!shouldBlock(e)) return;
 
-      console.log(`[Calm Enter] blocked ${eventType}`, e.key);
       e.stopPropagation();
       e.preventDefault();
       e.stopImmediatePropagation();
 
-      // keydown のときだけ改行を挿入
       if (eventType === "keydown") {
-        const host = location.hostname;
-        if (host === "chatgpt.com") {
-          e.target.dispatchEvent(
-            new KeyboardEvent("keydown", {
-              key: "Enter",
-              code: "Enter",
-              shiftKey: true,
-              bubbles: true,
-              cancelable: true,
-            })
-          );
-        } else if (host === "claude.ai") {
-          document.execCommand("insertParagraph");
-        } else if (host === "www.perplexity.ai") {
-          e.target.dispatchEvent(
-            new KeyboardEvent("keydown", {
-              key: "Enter",
-              code: "Enter",
-              shiftKey: true,
-              bubbles: true,
-              cancelable: true,
-            })
-          );
-        } else {
-          document.execCommand("insertLineBreak");
-        }
+        insertNewline(e.target);
       }
     },
     true // capture phase

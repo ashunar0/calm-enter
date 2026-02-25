@@ -3,7 +3,7 @@
   "name": "Calm Enter",
   "version": "1.0.0",
   "description": "AIチャットで Enter = 改行、Cmd+Enter = 送信に変更する",
-  "permissions": ["storage", "activeTab"],
+  "permissions": ["storage"],
   "host_permissions": [
     "*://claude.ai/*",
     "*://chatgpt.com/*",
