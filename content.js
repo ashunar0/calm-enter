@@ -10,6 +10,25 @@ chrome.storage.onChanged.addListener((changes) => {
   }
 });
 
+function insertNewline(target) {
+  const host = location.hostname;
+  if (host === "chatgpt.com") {
+    // ChatGPT: Shift+Enter 再発火が有効
+    target.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "Enter",
+        code: "Enter",
+        shiftKey: true,
+        bubbles: true,
+        cancelable: true,
+      })
+    );
+  } else {
+    // claude.ai, gemini, perplexity: execCommand で改行挿入
+    document.execCommand("insertLineBreak");
+  }
+}
+
 document.addEventListener(
   "keydown",
   (e) => {
@@ -24,16 +43,7 @@ document.addEventListener(
     ) {
       e.preventDefault();
       e.stopPropagation();
-      // Shift+Enter を再発火して改行を挿入（各サイトの既存の改行処理を利用）
-      e.target.dispatchEvent(
-        new KeyboardEvent("keydown", {
-          key: "Enter",
-          code: "Enter",
-          shiftKey: true,
-          bubbles: true,
-          cancelable: true,
-        })
-      );
+      insertNewline(e.target);
     }
   },
   true // capture phase
