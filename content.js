@@ -48,6 +48,8 @@ for (const eventType of ["keydown", "keypress", "keyup"]) {
               cancelable: true,
             })
           );
+        } else if (host === "claude.ai") {
+          document.execCommand("insertParagraph");
         } else {
           document.execCommand("insertLineBreak");
         }
