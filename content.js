@@ -24,8 +24,16 @@ function insertNewline(target) {
       })
     );
   } else {
-    // claude.ai, gemini, perplexity: execCommand で改行挿入
-    document.execCommand("insertLineBreak");
+    // claude.ai, gemini, perplexity: InputEvent で改行挿入
+    // ProseMirror 等のモダンエディタは beforeinput を処理する
+    target.dispatchEvent(
+      new InputEvent("beforeinput", {
+        inputType: "insertLineBreak",
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+      })
+    );
   }
 }
 
