@@ -10,6 +10,9 @@ chrome.action.onClicked.addListener(async (tab) => {
   await chrome.storage.local.set({ enabled: next });
 
   // アイコンとツールチップを更新
+  chrome.action.setIcon({
+    path: next ? "icons/icon-on-48.png" : "icons/icon-off-48.png",
+  });
   chrome.action.setTitle({
     title: next ? "Calm Enter: ON" : "Calm Enter: OFF",
   });
