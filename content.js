@@ -10,33 +10,6 @@ chrome.storage.onChanged.addListener((changes) => {
   }
 });
 
-function insertNewline(target) {
-  const host = location.hostname;
-  if (host === "chatgpt.com") {
-    // ChatGPT: Shift+Enter 再発火が有効
-    target.dispatchEvent(
-      new KeyboardEvent("keydown", {
-        key: "Enter",
-        code: "Enter",
-        shiftKey: true,
-        bubbles: true,
-        cancelable: true,
-      })
-    );
-  } else {
-    // claude.ai, gemini, perplexity: InputEvent で改行挿入
-    // ProseMirror 等のモダンエディタは beforeinput を処理する
-    target.dispatchEvent(
-      new InputEvent("beforeinput", {
-        inputType: "insertLineBreak",
-        bubbles: true,
-        cancelable: true,
-        composed: true,
-      })
-    );
-  }
-}
-
 document.addEventListener(
   "keydown",
   (e) => {
@@ -49,9 +22,27 @@ document.addEventListener(
       !e.shiftKey &&
       !e.isComposing
     ) {
-      e.preventDefault();
+      // サイトの送信ハンドラをブロック
       e.stopPropagation();
-      insertNewline(e.target);
+
+      const host = location.hostname;
+      if (host === "claude.ai") {
+        // Claude: preventDefault せず、ブラウザのデフォルト改行挿入に任せる
+      } else if (host === "chatgpt.com") {
+        // ChatGPT: Shift+Enter 再発火で改行
+        e.preventDefault();
+        e.target.dispatchEvent(
+          new KeyboardEvent("keydown", {
+            key: "Enter",
+            code: "Enter",
+            shiftKey: true,
+            bubbles: true,
+            cancelable: true,
+          })
+        );
+      } else {
+        // gemini, perplexity: デフォルト改行挿入に任せる
+      }
     }
   },
   true // capture phase
